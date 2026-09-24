@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { Upload, X, ImageIcon } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface ImageUploadProps {
   label?: string;
@@ -13,8 +14,9 @@ export function ImageUpload({ label = 'Upload Image', onImageChange, currentImag
   const fileRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | undefined>(currentImage);
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file.');
       return;
@@ -24,13 +26,27 @@ export function ImageUpload({ label = 'Upload Image', onImageChange, currentImag
       return;
     }
     setError('');
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      setPreview(result);
-      onImageChange(result);
-    };
-    reader.readAsDataURL(file);
+    setUploading(true);
+
+    const localPreview = URL.createObjectURL(file);
+    setPreview(localPreview);
+
+    const filePath = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${file.name.replace(/\s/g, '_')}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('civix-images')
+      .upload(filePath, file, { contentType: file.type });
+
+    if (uploadError) {
+      setError('Upload failed. Please try again.');
+      setPreview(undefined);
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from('civix-images').getPublicUrl(filePath);
+    setUploading(false);
+    onImageChange(urlData.publicUrl);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -57,14 +73,21 @@ export function ImageUpload({ label = 'Upload Image', onImageChange, currentImag
       {preview ? (
         <div className="relative overflow-hidden rounded-lg border border-gray-200">
           <img src={preview} alt="Preview" className="h-40 w-full object-cover" />
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-white transition-colors hover:bg-black/80"
-            aria-label="Remove image"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          {uploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            </div>
+          )}
+          {!uploading && (
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="absolute right-2 top-2 rounded-full bg-black/60 p-1.5 text-white transition-colors hover:bg-black/80"
+              aria-label="Remove image"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
       ) : (
         <div

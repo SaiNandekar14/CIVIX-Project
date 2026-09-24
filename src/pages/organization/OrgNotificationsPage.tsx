@@ -37,8 +37,8 @@ export function OrgNotificationsPage() {
               <div
                 key={n.id}
                 className={`card flex items-start gap-3 p-4 cursor-pointer ${!n.read ? 'border-orange-200 bg-orange-50/30' : ''}`}
-                onClick={() => {
-                  store.markNotificationRead(n.id);
+                onClick={async () => {
+                  await store.markNotificationRead(n.id);
                   if (n.postId) navigate(`/organization/issue/${n.postId}`);
                 }}
               >

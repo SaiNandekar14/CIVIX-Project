@@ -20,8 +20,8 @@ export function DeletePostButton({ post, variant = 'inline' }: Props) {
 
   if (!canDelete) return null;
 
-  const handleDelete = () => {
-    store.deletePost(post.id);
+  const handleDelete = async () => {
+    await store.deletePost(post.id);
     setDeleted(true);
     setTimeout(() => {
       if (user?.role === 'citizen') {

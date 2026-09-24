@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { StoreProvider } from './state/StoreContext';
+import { StoreProvider, useStore } from './state/StoreContext';
 
 // Layouts
 import { PublicLayout } from './components/PublicLayout';
@@ -35,9 +35,22 @@ import { OrgCommunityFeedback } from './pages/organization/OrgCommunityFeedback'
 import { OrgPublicProfilePage } from './pages/organization/OrgPublicProfile';
 import { OrgNotificationsPage } from './pages/organization/OrgNotificationsPage';
 
+function LoadingGate({ children }: { children: React.ReactNode }) {
+  const { loading } = useStore();
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-sm text-gray-400">Loading…</div>
+      </div>
+    );
+  }
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <StoreProvider>
+      <LoadingGate>
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
@@ -91,6 +104,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      </LoadingGate>
     </StoreProvider>
   );
 }

@@ -21,7 +21,7 @@ export function CitizenProfilePage() {
   const [photo, setPhoto] = useState<string | undefined>(user.photo);
   const [savedMsg, setSavedMsg] = useState(false);
 
-  const updateSetting = (setting: 'privacy' | 'orgCommunication', value: string) => {
+  const updateSetting = async (setting: 'privacy' | 'orgCommunication', value: string) => {
     const updates: Partial<typeof user> = {};
     if (setting === 'privacy') {
       setPrivacy(value as any);
@@ -31,13 +31,13 @@ export function CitizenProfilePage() {
       setOrgComm(value as any);
       updates.orgCommunication = value as any;
     }
-    store.updateCitizen(user.id, updates);
+    await store.updateCitizen(user.id, updates);
     showSaved();
   };
 
-  const handlePhotoChange = (data: string | undefined) => {
+  const handlePhotoChange = async (data: string | undefined) => {
     setPhoto(data);
-    store.updateCitizen(user.id, { photo: data });
+    await store.updateCitizen(user.id, { photo: data });
     showSaved();
   };
 

@@ -29,7 +29,7 @@ export function RegisterPage() {
   const [oDescription, setODescription] = useState('');
   const [oError, setOError] = useState('');
 
-  const handleCitizenSubmit = (e: React.FormEvent) => {
+  const handleCitizenSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cName || !cEmail || !cPassword || !cLocality) {
       setCError('Please fill in all required fields.');
@@ -43,12 +43,12 @@ export function RegisterPage() {
       setCError('Please agree to the privacy and community guidelines.');
       return;
     }
-    const existing = store.login(cEmail, cPassword);
+    const existing = await store.login(cEmail, cPassword);
     if (existing) {
       setCError('An account with this email already exists.');
       return;
     }
-    store.registerCitizen({
+    await store.registerCitizen({
       name: cName,
       email: cEmail,
       password: cPassword,
@@ -57,7 +57,7 @@ export function RegisterPage() {
     navigate('/citizen');
   };
 
-  const handleOrgSubmit = (e: React.FormEvent) => {
+  const handleOrgSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!oName || !oType || !oEmail || !oPassword || !oContact || !oServiceArea || !oDescription) {
       setOError('Please fill in all required fields.');
@@ -67,7 +67,7 @@ export function RegisterPage() {
       setOError('Passwords do not match.');
       return;
     }
-    store.registerOrganization({
+    await store.registerOrganization({
       orgName: oName,
       orgType: oType,
       email: oEmail,

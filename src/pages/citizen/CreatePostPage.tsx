@@ -51,7 +51,7 @@ export function CreatePostPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !description || !locality) {
       setError('Please fill in all required fields.');
@@ -71,7 +71,7 @@ export function CreatePostPage() {
     }
 
     const authorName = isCitizen ? citizen.name : org.orgName;
-    const post = store.createPost({
+    const post = await store.createPost({
       type: postType as any,
       title,
       description,
@@ -92,7 +92,7 @@ export function CreatePostPage() {
     if (postType === 'Issue' && selectedOrgId) {
       const assignedOrg = store.getOrganization(selectedOrgId);
       if (assignedOrg) {
-        store.addNotification({
+        await store.addNotification({
           userId: selectedOrgId,
           text: `New ${category} issue assigned to ${assignedOrg.orgName}: "${title}".`,
           type: 'organization',

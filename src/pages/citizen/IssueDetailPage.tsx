@@ -76,17 +76,17 @@ export function IssueDetailPage() {
 
   const showRequestButton = isOrg && authorCitizen && citizenSettings !== 'allow' && !existingCommRequest;
 
-  const handleComment = (e: React.FormEvent) => {
+  const handleComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim() || !user) return;
-    store.addComment(post.id, commentText, isOrg);
+    await store.addComment(post.id, commentText, isOrg);
     setCommentText('');
   };
 
-  const handleStatusChange = (newStatus: IssueStatus) => {
-    store.updatePost(post.id, { status: newStatus, assignedOrgId: post.assignedOrgId || user?.id });
+  const handleStatusChange = async (newStatus: IssueStatus) => {
+    await store.updatePost(post.id, { status: newStatus, assignedOrgId: post.assignedOrgId || user?.id });
     if (post.authorId !== user?.id) {
-      store.addNotification({
+      await store.addNotification({
         userId: post.authorId,
         text: `Your issue "${post.title}" status changed to ${newStatus}.`,
         type: 'status',
@@ -95,18 +95,18 @@ export function IssueDetailPage() {
     }
   };
 
-  const handleResolutionSubmit = (e: React.FormEvent) => {
+  const handleResolutionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resolutionDesc) return;
     if (!resolutionImageData) return; // Required proof image
-    store.updatePost(post.id, {
+    await store.updatePost(post.id, {
       status: 'Resolution Submitted',
       resolutionDescription: resolutionDesc,
       resolutionDate: resolutionDate,
       resolutionImage: resolutionImageData,
       assignedOrgId: post.assignedOrgId || user?.id,
     });
-    store.addNotification({
+    await store.addNotification({
       userId: post.authorId,
       text: `A resolution has been submitted for your issue "${post.title}". Community feedback is now open.`,
       type: 'resolution',
@@ -115,20 +115,20 @@ export function IssueDetailPage() {
     setShowResolutionForm(false);
   };
 
-  const handleFeedback = (resolved: boolean) => {
+  const handleFeedback = async (resolved: boolean) => {
     if (feedbackGiven) return;
-    store.updatePost(post.id, {
+    await store.updatePost(post.id, {
       status: 'Community Feedback',
       feedbackYes: (post.feedbackYes || 0) + (resolved ? 1 : 0),
       feedbackNo: (post.feedbackNo || 0) + (resolved ? 0 : 1),
     });
     setFeedbackGiven(true);
     if (feedbackComment.trim()) {
-      store.addComment(post.id, feedbackComment, false);
+      await store.addComment(post.id, feedbackComment, false);
       setFeedbackComment('');
     }
     if (post.assignedOrgId) {
-      store.addNotification({
+      await store.addNotification({
         userId: post.assignedOrgId,
         text: resolved
           ? `A citizen confirmed resolution for "${post.title}".`
@@ -139,9 +139,9 @@ export function IssueDetailPage() {
     }
   };
 
-  const handleRequestCommunication = () => {
+  const handleRequestCommunication = async () => {
     if (!isOrg || !authorCitizen || !user) return;
-    store.requestCommunication(
+    await store.requestCommunication(
       user.id,
       (user as any).orgName,
       authorCitizen.id,
@@ -150,7 +150,7 @@ export function IssueDetailPage() {
       post.title,
       `Need to discuss the ${post.category} issue at ${post.locality}.`
     );
-    store.addNotification({
+    await store.addNotification({
       userId: authorCitizen.id,
       text: `${(user as any).orgName} requested permission to contact you regarding "${post.title}".`,
       type: 'communication',

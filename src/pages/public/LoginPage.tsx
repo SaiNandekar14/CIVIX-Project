@@ -10,13 +10,13 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
-    const user = store.login(email, password);
+    const user = await store.login(email, password);
     if (!user) {
       setError('Invalid email or password. Try a demo account below.');
       return;
@@ -24,8 +24,8 @@ export function LoginPage() {
     navigate(user.role === 'citizen' ? '/citizen' : '/organization');
   };
 
-  const handleDemo = (role: 'citizen' | 'organization') => {
-    store.loginDemo(role);
+  const handleDemo = async (role: 'citizen' | 'organization') => {
+    await store.loginDemo(role);
     navigate(role === 'citizen' ? '/citizen' : '/organization');
   };
 
