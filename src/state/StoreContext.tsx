@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
-import type { Post, Comment, Notification, User, ReactionRecord, ReactionType, CommRequest, CitizenUser, OrganizationUser } from '../types';
+import type { Post, Comment, Notification, User, ReactionRecord, ReactionType, CommRequest, CitizenUser, OrganizationUser, InterestRecord } from '../types';
 import { supabase } from '../lib/supabase';
 
 // ============================================
@@ -131,6 +131,7 @@ interface AppState {
   posts: Post[];
   comments: Comment[];
   reactions: ReactionRecord[];
+  interests: InterestRecord[];
   notifications: Notification[];
   commRequests: CommRequest[];
   currentUserId: string | null;
@@ -168,6 +169,9 @@ interface StoreContextType {
   getCommRequestsForOrg: (orgId: string) => CommRequest[];
   getCommRequestByOrgAndCitizen: (orgId: string, citizenId: string) => CommRequest | undefined;
   updateCitizen: (id: string, updates: Partial<CitizenUser>) => Promise<void>;
+  getInterest: (userId: string, postId: string) => boolean;
+  toggleInterest: (userId: string, postId: string) => Promise<void>;
+  getInterestCount: (postId: string) => number;
   getAllPosts: () => Post[];
   getUser: (id: string) => User | undefined;
   getOrganization: (id: string) => OrganizationUser | undefined;
@@ -334,6 +338,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     posts: [],
     comments: [],
     reactions: [],
+    interests: [],
     notifications: [],
     commRequests: [],
     currentUserId: null,
@@ -341,7 +346,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   });
 
   const loadAll = useCallback(async () => {
-    const [usersRes, orgsRes, issuesRes, orgPostsRes, reactionsRes, commentsRes, notificationsRes, commReqRes] = await Promise.all([
+    const [usersRes, orgsRes, issuesRes, orgPostsRes, reactionsRes, commentsRes, notificationsRes, commReqRes, interestsRes] = await Promise.all([
       supabase.from('users').select('*'),
       supabase.from('organizations').select('*'),
       supabase.from('issues').select('*').order('created_at', { ascending: false }),
@@ -350,6 +355,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       supabase.from('comments').select('*'),
       supabase.from('notifications').select('*').order('created_at', { ascending: false }),
       supabase.from('communication_requests').select('*').order('created_at', { ascending: false }),
+      supabase.from('interests').select('*'),
     ]);
 
     const citizens = (usersRes.data as DbUser[] | null ?? []).map(mapDbUserToCitizen);
@@ -369,6 +375,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       posts: [...issuePosts, ...orgPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
       comments: (commentsRes.data as DbComment[] | null ?? []).map(mapDbComment),
       reactions: (reactionsRes.data as DbReaction[] | null ?? []).map(mapDbReaction),
+      interests: (interestsRes.data as { org_post_id: string; user_id: string }[] | null ?? []).map((i) => ({ userId: i.user_id, postId: i.org_post_id })),
       notifications: (notificationsRes.data as DbNotification[] | null ?? []).map(mapDbNotification),
       commRequests: (commReqRes.data as DbCommRequest[] | null ?? []).map(mapDbCommRequest),
       currentUserId: state.currentUserId,
@@ -796,7 +803,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (updates.orgCommunication !== undefined) dbUpdates.org_communication = updates.orgCommunication;
 
     if (Object.keys(dbUpdates).length > 0) {
-      await supabase.from('users').update(dbUpdates).eq('id', id);
+      const { error } = await supabase.from('users').update(dbUpdates).eq('id', id);
+      if (error) throw error;
     }
 
     setState((s) => ({
@@ -804,6 +812,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       users: s.users.map((u) => (u.id === id && u.role === 'citizen' ? { ...u, ...updates } as CitizenUser : u)),
     }));
   }, []);
+
+  const getInterest = useCallback((userId: string, postId: string): boolean => {
+    return state.interests.some((i) => i.userId === userId && i.postId === postId);
+  }, [state.interests]);
+
+  const toggleInterest = useCallback(async (userId: string, postId: string) => {
+    const existing = state.interests.some((i) => i.userId === userId && i.postId === postId);
+    if (existing) {
+      await supabase.from('interests').delete().eq('org_post_id', postId).eq('user_id', userId);
+      setState((s) => ({
+        ...s,
+        interests: s.interests.filter((i) => !(i.userId === userId && i.postId === postId)),
+        posts: s.posts.map((p) => p.id === postId ? { ...p, interestedCount: Math.max(0, (p.interestedCount ?? 0) - 1) } : p),
+      }));
+    } else {
+      await supabase.from('interests').insert({ org_post_id: postId, user_id: userId });
+      setState((s) => ({
+        ...s,
+        interests: [...s.interests, { userId, postId }],
+        posts: s.posts.map((p) => p.id === postId ? { ...p, interestedCount: (p.interestedCount ?? 0) + 1 } : p),
+      }));
+    }
+  }, [state.interests]);
+
+  const getInterestCount = useCallback((postId: string): number => {
+    return state.interests.filter((i) => i.postId === postId).length;
+  }, [state.interests]);
 
   const getAllPosts = useCallback(() => state.posts, [state.posts]);
 
@@ -845,6 +880,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         getCommRequestsForOrg,
         getCommRequestByOrgAndCitizen,
         updateCitizen,
+        getInterest,
+        toggleInterest,
+        getInterestCount,
         getAllPosts,
         getUser,
         getOrganization,

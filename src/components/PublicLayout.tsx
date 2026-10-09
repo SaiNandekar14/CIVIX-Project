@@ -4,7 +4,13 @@ import { useStore } from '../state/StoreContext';
 import { Menu, X, MapPin } from 'lucide-react';
 import { useState } from 'react';
 
-const navItems = [
+const publicNavItems = [
+  { to: '/', label: 'Home' },
+  { to: '/organizations', label: 'Organizations' },
+  { to: '/about', label: 'About' },
+];
+
+const authedNavItems = [
   { to: '/', label: 'Home' },
   { to: '/explore', label: 'Explore' },
   { to: '/organizations', label: 'Organizations' },
@@ -15,6 +21,7 @@ export function PublicLayout() {
   const store = useStore();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navItems = store.currentUser ? authedNavItems : publicNavItems;
 
   return (
     <div className="min-h-screen bg-stone-50">

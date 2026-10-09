@@ -5,7 +5,7 @@ import { MapView } from '../../components/MapView';
 import { ReactionBar } from '../../components/ReactionBar';
 import { StatusBadge, CategoryBadge, VerifiedBadge } from '../../components/Badge';
 import { ImageUpload } from '../../components/ImageUpload';
-import { MapPin, Clock, MessageSquare, Send, ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Users, Building2, Mail, Lock, CheckCircle } from 'lucide-react';
+import { MapPin, Clock, MessageSquare, Send, ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Users, Building2, Mail, Lock, CheckCircle, Heart } from 'lucide-react';
 import { DeletePostButton } from '../../components/DeletePostButton';
 import type { IssueStatus } from '../../types';
 
@@ -168,6 +168,16 @@ export function IssueDetailPage() {
 
   const orgProfileLink = (orgId: string) => `${basePath}/organizations/${orgId}`;
 
+  const isEventOrInitiative = post.type === 'Event' || post.type === 'Community Initiative';
+  const isInterested = user?.role === 'citizen' && store.getInterest(user.id, post.id);
+  const interestCount = store.getInterestCount(post.id);
+
+  const handleInterestToggle = async () => {
+    if (!user) { navigate('/login'); return; }
+    if (user.role !== 'citizen' || !isEventOrInitiative) return;
+    await store.toggleInterest(user.id, post.id);
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
       <button onClick={() => navigate(backPath)} className="mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
@@ -202,6 +212,40 @@ export function IssueDetailPage() {
           <DeletePostButton post={post} variant="full" />
         </div>
       </div>
+
+      {/* Interest toggle for events/initiatives */}
+      {isEventOrInitiative && (
+        <div className="card mb-4 p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                <Heart className={`h-5 w-5 ${isInterested ? 'fill-orange-500 text-orange-500' : 'text-orange-600'}`} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">{interestCount} citizen{interestCount !== 1 ? 's' : ''} interested</p>
+                <p className="text-xs text-gray-500">{isInterested ? 'You marked this as interesting' : 'Express your interest in this event'}</p>
+              </div>
+            </div>
+            {user?.role === 'citizen' ? (
+              <button
+                onClick={handleInterestToggle}
+                className={`inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                  isInterested
+                    ? 'border-orange-500 bg-orange-50 text-orange-700'
+                    : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Heart className={`h-4 w-4 ${isInterested ? 'fill-orange-500 text-orange-500' : ''}`} />
+                {isInterested ? 'Interested' : 'Mark Interested'}
+              </button>
+            ) : !user ? (
+              <Link to="/login" className="btn-secondary text-sm">
+                Sign in to express interest
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      )}
 
       {/* Map preview */}
       {post.lat != null && post.lng != null && (
