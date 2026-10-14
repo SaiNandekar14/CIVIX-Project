@@ -128,7 +128,7 @@ export function OrganizationLayout() {
       )}
 
       <div className="md:pl-60">
-        <main className="min-h-screen pt-14 md:pt-0">
+        <main className="min-h-screen pt-14 pb-6 md:pt-0 md:pb-0">
           <Outlet />
         </main>
       </div>

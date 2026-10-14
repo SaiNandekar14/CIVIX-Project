@@ -18,11 +18,17 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #1f2937;
     background-color: #fafaf9;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
   h1, h2, h3, h4 {
     line-height: 1.2;
     letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  p {
+    line-height: 1.6;
   }
 }
 
@@ -32,7 +38,7 @@
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50 hover:border-gray-400 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .btn-ghost {
@@ -41,6 +47,10 @@
 
   .card {
     @apply rounded-xl border border-gray-200 bg-white shadow-sm;
+  }
+
+  .card-hover {
+    @apply rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-gray-300 hover:shadow-md;
   }
 
   .input {
@@ -53,6 +63,18 @@
 
   .badge {
     @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .section-title {
+    @apply text-sm font-semibold text-gray-900;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-gray-900;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-gray-500;
   }
 }
 
@@ -82,4 +104,11 @@ a:focus-visible, button:focus-visible {
   outline: 2px solid #ea580c;
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Smooth transitions for theme elements */
+button, a, input, select, textarea {
+  transition-property: background-color, border-color, color, box-shadow, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
 }

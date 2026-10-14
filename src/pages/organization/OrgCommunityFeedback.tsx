@@ -47,7 +47,7 @@ export function OrgCommunityFeedback() {
               <Link
                 key={issue.id}
                 to={`/organization/issue/${issue.id}`}
-                className="card block p-5 transition-all hover:shadow-md hover:border-gray-300"
+                className="card-hover block p-5"
               >
                 <div className="mb-2 flex items-start justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">

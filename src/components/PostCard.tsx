@@ -43,7 +43,7 @@ export function PostCard({ post, showCommunitySignal = true }: { post: Post; sho
 
   if (post.type === 'Issue') {
     return (
-      <Link to={linkTo} className="card block p-4 transition-all hover:shadow-md hover:border-gray-300">
+      <Link to={linkTo} className="card-hover block p-4">
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
             {post.category && <CategoryBadge category={post.category} />}
@@ -76,7 +76,7 @@ export function PostCard({ post, showCommunitySignal = true }: { post: Post; sho
 
   // Event / Initiative / Announcement / Community Update
   return (
-    <div className="card block p-4 transition-all hover:shadow-md hover:border-gray-300">
+    <div className="card-hover block p-4">
       <Link to={linkTo}>
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
@@ -115,7 +115,7 @@ export function PostCard({ post, showCommunitySignal = true }: { post: Post; sho
       {(isEventOrInitiative || post.type === 'Event') && (
         <div className="flex items-center gap-3 border-t border-gray-100 pt-3 text-xs text-gray-600">
           <span className="inline-flex items-center gap-1">
-            <span className="font-semibold text-orange-600">{store.getInterestCount(post.id)}</span> interested
+            <span className="font-semibold text-gray-900">{store.getInterestCount(post.id)}</span> interested
           </span>
           {isEventOrInitiative && (
             <button
@@ -130,11 +130,14 @@ export function PostCard({ post, showCommunitySignal = true }: { post: Post; sho
               {isInterested ? 'Interested' : 'Mark Interested'}
             </button>
           )}
+          <DeletePostButton post={post} />
         </div>
       )}
-      <div className="mt-2">
-        <DeletePostButton post={post} />
-      </div>
+      {!isEventOrInitiative && post.type !== 'Event' && (
+        <div className="border-t border-gray-100 pt-3">
+          <DeletePostButton post={post} />
+        </div>
+      )}
     </div>
   );
 }

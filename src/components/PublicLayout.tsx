@@ -105,14 +105,14 @@ export function PublicLayout() {
       <main>
         <Outlet />
       </main>
-      <footer className="border-t border-gray-200 bg-white">
+      <footer className="border-t border-gray-200 bg-stone-50">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <Logo />
             <p className="text-center text-sm text-gray-500 sm:text-right">
               For the Community. To the Community. With the Community.
               <br />
-              <span className="text-xs">Pilot City: Nagpur, Maharashtra. CIVIX is a demonstration prototype and is not affiliated with any real government organization.</span>
+              <span className="text-xs text-gray-400">Pilot City: Nagpur, Maharashtra. CIVIX is a demonstration prototype and is not affiliated with any real government organization.</span>
             </p>
           </div>
         </div>

@@ -21,7 +21,7 @@ export function CategoryBadge({ category }: { category: string }) {
   const iconName = CATEGORY_ICONS[category] || 'CircleAlert';
   const Icon = (LucideIcons as unknown as Record<string, ComponentType<SVGProps<SVGSVGElement> & LucideProps>>)[iconName] || LucideIcons.CircleAlert;
   return (
-    <span className="badge border-orange-200 bg-orange-50 text-orange-700">
+    <span className="badge border-gray-200 bg-gray-50 text-gray-700">
       <Icon className="h-3 w-3" />
       {category}
     </span>

@@ -63,7 +63,7 @@ export function OrgIssues() {
               <Link
                 key={issue.id}
                 to={`/organization/issue/${issue.id}`}
-                className="card block p-4 transition-all hover:shadow-md hover:border-gray-300"
+                className="card-hover block p-4"
               >
                 <div className="mb-2 flex items-start justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
@@ -81,8 +81,8 @@ export function OrgIssues() {
                   </span>
                 </div>
                 <div className="mt-3 flex items-center gap-4 border-t border-gray-100 pt-3 text-sm">
-                  <span className="inline-flex items-center gap-1 font-semibold text-orange-600">
-                    <Users className="h-3.5 w-3.5" />
+                  <span className="inline-flex items-center gap-1 font-semibold text-gray-900">
+                    <Users className="h-3.5 w-3.5 text-orange-600" />
                     {counts.sameIssue} Same Issue
                   </span>
                   <span className="inline-flex items-center gap-1 font-semibold text-blue-600">

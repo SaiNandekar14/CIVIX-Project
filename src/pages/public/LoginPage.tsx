@@ -86,12 +86,16 @@ export function LoginPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => handleDemo('citizen')} className="card flex flex-col items-center gap-2 p-4 transition-all hover:border-orange-300 hover:shadow-md">
-            <User className="h-5 w-5 text-orange-600" />
+          <button onClick={() => handleDemo('citizen')} className="card flex flex-col items-center gap-2 p-4 transition-all hover:border-gray-300 hover:shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-50 text-gray-600">
+              <User className="h-5 w-5" />
+            </div>
             <span className="text-sm font-medium text-gray-700">Citizen Demo</span>
           </button>
-          <button onClick={() => handleDemo('organization')} className="card flex flex-col items-center gap-2 p-4 transition-all hover:border-orange-300 hover:shadow-md">
-            <Building2 className="h-5 w-5 text-orange-600" />
+          <button onClick={() => handleDemo('organization')} className="card flex flex-col items-center gap-2 p-4 transition-all hover:border-gray-300 hover:shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-50 text-gray-600">
+              <Building2 className="h-5 w-5" />
+            </div>
             <span className="text-sm font-medium text-gray-700">Organization Demo</span>
           </button>
         </div>

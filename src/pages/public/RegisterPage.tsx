@@ -90,28 +90,28 @@ export function RegisterPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <button
             onClick={() => setRole('citizen')}
-            className="card group flex flex-col items-center p-8 text-center transition-all hover:border-orange-300 hover:shadow-lg"
+            className="card group flex flex-col items-center p-8 text-center transition-all hover:border-gray-300 hover:shadow-md"
           >
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 transition-colors group-hover:bg-orange-100">
-              <User className="h-8 w-8" />
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gray-50 text-gray-600 transition-colors group-hover:bg-gray-100">
+              <User className="h-7 w-7" />
             </div>
             <h2 className="mb-2 text-xl font-bold text-gray-900">Citizen</h2>
             <p className="text-sm text-gray-500">Participate in your community, share experiences and follow civic issues.</p>
-            <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-orange-600">
+            <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 group-hover:text-gray-900">
               Continue as Citizen
               <ArrowRight className="h-4 w-4" />
             </span>
           </button>
           <button
             onClick={() => setRole('organization')}
-            className="card group flex flex-col items-center p-8 text-center transition-all hover:border-orange-300 hover:shadow-lg"
+            className="card group flex flex-col items-center p-8 text-center transition-all hover:border-gray-300 hover:shadow-md"
           >
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100">
-              <Building2 className="h-8 w-8" />
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gray-50 text-gray-600 transition-colors group-hover:bg-gray-100">
+              <Building2 className="h-7 w-7" />
             </div>
             <h2 className="mb-2 text-xl font-bold text-gray-900">Organization</h2>
             <p className="text-sm text-gray-500">Respond to community issues, communicate actions and build public accountability.</p>
-            <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600">
+            <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 group-hover:text-gray-900">
               Continue as Organization
               <ArrowRight className="h-4 w-4" />
             </span>
@@ -169,8 +169,8 @@ export function RegisterPage() {
               ))}
             </select>
           </div>
-          <div className="flex items-start gap-2 rounded-lg bg-orange-50/50 px-3 py-2.5 text-xs text-gray-600">
-            <ShieldCheck className="h-4 w-4 shrink-0 text-orange-600 mt-0.5" />
+          <div className="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2.5 text-xs text-gray-600">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-gray-400 mt-0.5" />
             <span>Your citizen profile is private by default. Only relevant basic information may be shared with an organization when communication is required.</span>
           </div>
           <label className="flex items-start gap-2 text-sm text-gray-600">
@@ -239,7 +239,7 @@ export function RegisterPage() {
           <label className="label" htmlFor="oDescription">Description</label>
           <textarea id="oDescription" className="input min-h-[80px]" value={oDescription} onChange={(e) => setODescription(e.target.value)} placeholder="Brief description of your organization" />
         </div>
-        <div className="flex items-start gap-2 rounded-lg bg-amber-50/50 px-3 py-2.5 text-xs text-gray-600">
+        <div className="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2.5 text-xs text-gray-600">
           <Lock className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
           <span>After registration, your organization will be in <strong>Pending Verification</strong> status until reviewed. A pre-verified demo organization account is available for testing.</span>
         </div>
