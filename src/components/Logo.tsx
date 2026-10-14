@@ -6,7 +6,7 @@ export function Logo({ className = '', showText = true }: { className?: string; 
       <img
         src="/image.png"
         alt="CIVIX — For the Community. To the Community. With the Community."
-        className={`${showText ? 'h-11 w-[132px]' : 'h-9 w-[108px]'} object-contain`}
+        className={`${showText ? 'h-14 w-[176px]' : 'h-11 w-[144px]'} object-contain`}
       />
     </Link>
   );
