@@ -14,12 +14,12 @@ export function ReactionBar({ postId, size = 'md' }: ReactionBarProps) {
   const myReaction = userId ? store.getReaction(userId, postId) : null;
   const counts = store.getReactionCounts(postId);
 
-  const handleClick = (reaction: ReactionType) => {
+  const handleClick = async (reaction: ReactionType) => {
     if (!userId) return;
     if (myReaction === reaction) {
-      store.removeReaction(userId, postId);
+      await store.removeReaction(userId, postId);
     } else if (!myReaction) {
-      store.setReaction(userId, postId, reaction);
+      await store.setReaction(userId, postId, reaction);
     }
   };
 

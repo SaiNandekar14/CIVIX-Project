@@ -1,6 +1,6 @@
 import { useStore } from '../../state/StoreContext';
 import { useState } from 'react';
-import { User, MapPin, Lock, ShieldCheck, MessageSquare, FileText, ThumbsUp, Users, CheckCircle2, Mail } from 'lucide-react';
+import { User, MapPin, Lock, Globe, ShieldCheck, MessageSquare, FileText, ThumbsUp, Users, CheckCircle2, AlertCircle } from 'lucide-react';
 import { ImageUpload } from '../../components/ImageUpload';
 
 export function CitizenProfilePage() {
@@ -20,30 +20,47 @@ export function CitizenProfilePage() {
   const [orgComm, setOrgComm] = useState(user.orgCommunication);
   const [photo, setPhoto] = useState<string | undefined>(user.photo);
   const [savedMsg, setSavedMsg] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(false);
 
-  const updateSetting = (setting: 'privacy' | 'orgCommunication', value: string) => {
-    const updates: Partial<typeof user> = {};
-    if (setting === 'privacy') {
-      setPrivacy(value as any);
-      updates.privacy = value as any;
+  const updateSetting = async (setting: 'privacy' | 'orgCommunication', value: string) => {
+    const prevPrivacy = privacy;
+    const prevOrgComm = orgComm;
+    try {
+      const updates: Partial<typeof user> = {};
+      if (setting === 'privacy') {
+        updates.privacy = value as any;
+        setPrivacy(value as any);
+      }
+      if (setting === 'orgCommunication') {
+        updates.orgCommunication = value as any;
+        setOrgComm(value as any);
+      }
+      await store.updateCitizen(user.id, updates);
+      setSavedMsg(true);
+      setErrorMsg(false);
+      setTimeout(() => setSavedMsg(false), 2500);
+    } catch {
+      setPrivacy(prevPrivacy);
+      setOrgComm(prevOrgComm);
+      setErrorMsg(true);
+      setSavedMsg(false);
+      setTimeout(() => setErrorMsg(false), 3500);
     }
-    if (setting === 'orgCommunication') {
-      setOrgComm(value as any);
-      updates.orgCommunication = value as any;
-    }
-    store.updateCitizen(user.id, updates);
-    showSaved();
   };
 
-  const handlePhotoChange = (data: string | undefined) => {
-    setPhoto(data);
-    store.updateCitizen(user.id, { photo: data });
-    showSaved();
-  };
-
-  const showSaved = () => {
-    setSavedMsg(true);
-    setTimeout(() => setSavedMsg(false), 2500);
+  const handlePhotoChange = async (data: string | undefined) => {
+    try {
+      setPhoto(data);
+      await store.updateCitizen(user.id, { photo: data });
+      setSavedMsg(true);
+      setErrorMsg(false);
+      setTimeout(() => setSavedMsg(false), 2500);
+    } catch {
+      setPhoto(user.photo);
+      setErrorMsg(true);
+      setSavedMsg(false);
+      setTimeout(() => setErrorMsg(false), 3500);
+    }
   };
 
   return (
@@ -65,9 +82,9 @@ export function CitizenProfilePage() {
               {user.locality}
             </div>
             <div className="mt-2">
-              <span className="badge border-gray-200 bg-gray-50 text-gray-600">
-                <Lock className="h-3 w-3" />
-                Private Profile
+              <span className={`badge ${privacy === 'public' ? 'border-green-200 bg-green-50 text-green-700' : 'border-gray-200 bg-gray-50 text-gray-600'}`}>
+                {privacy === 'public' ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                {privacy === 'public' ? 'Public Profile' : 'Private Profile'}
               </span>
             </div>
           </div>
@@ -102,6 +119,11 @@ export function CitizenProfilePage() {
               <CheckCircle2 className="h-3.5 w-3.5" /> Settings saved
             </span>
           )}
+          {errorMsg && (
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600">
+              <AlertCircle className="h-3.5 w-3.5" /> Save failed — reverted
+            </span>
+          )}
         </div>
 
         <div className="space-y-5">
@@ -118,7 +140,7 @@ export function CitizenProfilePage() {
           <div>
             <label className="label">Profile Visibility</label>
             <div className="flex gap-2">
-              {['private', 'public'].map((v) => (
+              {(['private', 'public'] as const).map((v) => (
                 <button
                   key={v}
                   onClick={() => updateSetting('privacy', v)}

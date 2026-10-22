@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { StoreProvider } from './state/StoreContext';
+import { StoreProvider, useStore } from './state/StoreContext';
+import type { ReactNode } from 'react';
 
 // Layouts
 import { PublicLayout } from './components/PublicLayout';
@@ -35,18 +36,38 @@ import { OrgCommunityFeedback } from './pages/organization/OrgCommunityFeedback'
 import { OrgPublicProfilePage } from './pages/organization/OrgPublicProfile';
 import { OrgNotificationsPage } from './pages/organization/OrgNotificationsPage';
 
+function LoadingGate({ children }: { children: ReactNode }) {
+  const { loading } = useStore();
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-sm text-gray-400">Loading…</div>
+      </div>
+    );
+  }
+  return <>{children}</>;
+}
+
+function RequireAuth({ children }: { children: ReactNode }) {
+  const { currentUser } = useStore();
+  if (!currentUser) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <StoreProvider>
+      <LoadingGate>
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/explore" element={<ExplorePage />} />
             <Route path="/organizations" element={<OrganizationsPage />} />
             <Route path="/organizations/:id" element={<OrganizationProfilePage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/explore" element={<RequireAuth><ExplorePage /></RequireAuth>} />
+            <Route path="/issue/:id" element={<RequireAuth><IssueDetailPage /></RequireAuth>} />
           </Route>
 
           {/* Auth routes (no layout wrapper) */}
@@ -84,13 +105,11 @@ function App() {
             <Route path="notifications" element={<OrgNotificationsPage />} />
           </Route>
 
-          {/* Public issue detail route (for unauthenticated viewers) */}
-          <Route path="/issue/:id" element={<IssueDetailPage />} />
-
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      </LoadingGate>
     </StoreProvider>
   );
 }

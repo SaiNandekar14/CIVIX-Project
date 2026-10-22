@@ -10,13 +10,13 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
-    const user = store.login(email, password);
+    const user = await store.login(email, password);
     if (!user) {
       setError('Invalid email or password. Try a demo account below.');
       return;
@@ -24,8 +24,8 @@ export function LoginPage() {
     navigate(user.role === 'citizen' ? '/citizen' : '/organization');
   };
 
-  const handleDemo = (role: 'citizen' | 'organization') => {
-    store.loginDemo(role);
+  const handleDemo = async (role: 'citizen' | 'organization') => {
+    await store.loginDemo(role);
     navigate(role === 'citizen' ? '/citizen' : '/organization');
   };
 
@@ -86,12 +86,16 @@ export function LoginPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => handleDemo('citizen')} className="card flex flex-col items-center gap-2 p-4 transition-all hover:border-orange-300 hover:shadow-md">
-            <User className="h-5 w-5 text-orange-600" />
+          <button onClick={() => handleDemo('citizen')} className="card flex flex-col items-center gap-2 p-4 transition-all hover:border-gray-300 hover:shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-50 text-gray-600">
+              <User className="h-5 w-5" />
+            </div>
             <span className="text-sm font-medium text-gray-700">Citizen Demo</span>
           </button>
-          <button onClick={() => handleDemo('organization')} className="card flex flex-col items-center gap-2 p-4 transition-all hover:border-orange-300 hover:shadow-md">
-            <Building2 className="h-5 w-5 text-orange-600" />
+          <button onClick={() => handleDemo('organization')} className="card flex flex-col items-center gap-2 p-4 transition-all hover:border-gray-300 hover:shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-50 text-gray-600">
+              <Building2 className="h-5 w-5" />
+            </div>
             <span className="text-sm font-medium text-gray-700">Organization Demo</span>
           </button>
         </div>

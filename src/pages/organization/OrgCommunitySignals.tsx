@@ -29,8 +29,8 @@ export function OrgCommunitySignals() {
         <p className="text-sm text-gray-500">Issues ranked by collective community attention</p>
       </div>
 
-      <div className="mb-4 rounded-lg bg-orange-50 p-3 text-sm text-orange-800">
-        <TrendingUp className="inline h-4 w-4 mr-1.5" />
+      <div className="mb-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
+        <TrendingUp className="inline h-4 w-4 mr-1.5 text-gray-400" />
         These issues have the highest number of citizens reporting the same experience. Prioritize them for action.
       </div>
 
@@ -48,10 +48,10 @@ export function OrgCommunitySignals() {
               <Link
                 key={issue.id}
                 to={`/organization/issue/${issue.id}`}
-                className="card block p-4 transition-all hover:shadow-md hover:border-gray-300"
+                className="card-hover block p-4"
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-bold text-orange-700">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-600">
                     {idx + 1}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -64,8 +64,8 @@ export function OrgCommunitySignals() {
                     </div>
                     <h3 className="text-base font-semibold text-gray-900">{issue.title}</h3>
                     <div className="mt-3 flex items-center gap-4 text-sm">
-                      <span className="inline-flex items-center gap-1 font-bold text-orange-600">
-                        <Users className="h-4 w-4" />
+                      <span className="inline-flex items-center gap-1 font-bold text-gray-900">
+                        <Users className="h-4 w-4 text-orange-600" />
                         {counts.sameIssue} Same Issue
                       </span>
                       <span className="inline-flex items-center gap-1 font-semibold text-blue-600">

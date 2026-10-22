@@ -84,8 +84,8 @@ export function CitizenLayout() {
       {/* Mobile header */}
       <div className="fixed top-0 left-0 right-0 z-30 flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 md:hidden">
         <Logo />
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-orange-700">
-          <MapPin className="h-3 w-3" /> Nagpur
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500">
+          <MapPin className="h-3 w-3 text-orange-600" /> Nagpur
         </span>
       </div>
 

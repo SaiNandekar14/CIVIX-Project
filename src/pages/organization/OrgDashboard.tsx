@@ -24,11 +24,11 @@ export function OrgDashboard() {
   const resolved = relevantIssues.filter((p) => p.status === 'Resolved');
 
   const stats = [
-    { label: 'New Issues', value: newIssues.length, icon: AlertCircle, color: 'text-orange-600', bg: 'bg-orange-50' },
-    { label: 'High Community Attention', value: highAttention.length, icon: Users, color: 'text-red-600', bg: 'bg-red-50' },
-    { label: 'In Progress', value: inProgress.length, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Resolution Pending', value: resolutionPending.length, icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Resolved', value: resolved.length, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'New Issues', value: newIssues.length, icon: AlertCircle, color: 'text-gray-700' },
+    { label: 'High Attention', value: highAttention.length, icon: Users, color: 'text-red-600' },
+    { label: 'In Progress', value: inProgress.length, icon: Clock, color: 'text-amber-600' },
+    { label: 'Resolution Pending', value: resolutionPending.length, icon: TrendingUp, color: 'text-blue-600' },
+    { label: 'Resolved', value: resolved.length, icon: CheckCircle2, color: 'text-green-600' },
   ];
 
   const recentIssues = [...relevantIssues]
@@ -46,7 +46,7 @@ export function OrgDashboard() {
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {stats.map((stat) => (
           <div key={stat.label} className="card p-4">
-            <div className={`mb-2 flex h-9 w-9 items-center justify-center rounded-lg ${stat.bg}`}>
+            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-gray-50">
               <stat.icon className={`h-5 w-5 ${stat.color}`} />
             </div>
             <div className="text-2xl font-bold text-gray-900">{stat.value}</div>

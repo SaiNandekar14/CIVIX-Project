@@ -5,7 +5,7 @@ import { MapView } from '../../components/MapView';
 import { ReactionBar } from '../../components/ReactionBar';
 import { StatusBadge, CategoryBadge, VerifiedBadge } from '../../components/Badge';
 import { ImageUpload } from '../../components/ImageUpload';
-import { MapPin, Clock, MessageSquare, Send, ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Users, Building2, Mail, Lock, CheckCircle } from 'lucide-react';
+import { MapPin, Clock, MessageSquare, Send, ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Users, Building2, Mail, Lock, CheckCircle, Heart } from 'lucide-react';
 import { DeletePostButton } from '../../components/DeletePostButton';
 import type { IssueStatus } from '../../types';
 
@@ -76,17 +76,17 @@ export function IssueDetailPage() {
 
   const showRequestButton = isOrg && authorCitizen && citizenSettings !== 'allow' && !existingCommRequest;
 
-  const handleComment = (e: React.FormEvent) => {
+  const handleComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim() || !user) return;
-    store.addComment(post.id, commentText, isOrg);
+    await store.addComment(post.id, commentText, isOrg);
     setCommentText('');
   };
 
-  const handleStatusChange = (newStatus: IssueStatus) => {
-    store.updatePost(post.id, { status: newStatus, assignedOrgId: post.assignedOrgId || user?.id });
+  const handleStatusChange = async (newStatus: IssueStatus) => {
+    await store.updatePost(post.id, { status: newStatus, assignedOrgId: post.assignedOrgId || user?.id });
     if (post.authorId !== user?.id) {
-      store.addNotification({
+      await store.addNotification({
         userId: post.authorId,
         text: `Your issue "${post.title}" status changed to ${newStatus}.`,
         type: 'status',
@@ -95,18 +95,18 @@ export function IssueDetailPage() {
     }
   };
 
-  const handleResolutionSubmit = (e: React.FormEvent) => {
+  const handleResolutionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resolutionDesc) return;
     if (!resolutionImageData) return; // Required proof image
-    store.updatePost(post.id, {
+    await store.updatePost(post.id, {
       status: 'Resolution Submitted',
       resolutionDescription: resolutionDesc,
       resolutionDate: resolutionDate,
       resolutionImage: resolutionImageData,
       assignedOrgId: post.assignedOrgId || user?.id,
     });
-    store.addNotification({
+    await store.addNotification({
       userId: post.authorId,
       text: `A resolution has been submitted for your issue "${post.title}". Community feedback is now open.`,
       type: 'resolution',
@@ -115,20 +115,20 @@ export function IssueDetailPage() {
     setShowResolutionForm(false);
   };
 
-  const handleFeedback = (resolved: boolean) => {
+  const handleFeedback = async (resolved: boolean) => {
     if (feedbackGiven) return;
-    store.updatePost(post.id, {
+    await store.updatePost(post.id, {
       status: 'Community Feedback',
       feedbackYes: (post.feedbackYes || 0) + (resolved ? 1 : 0),
       feedbackNo: (post.feedbackNo || 0) + (resolved ? 0 : 1),
     });
     setFeedbackGiven(true);
     if (feedbackComment.trim()) {
-      store.addComment(post.id, feedbackComment, false);
+      await store.addComment(post.id, feedbackComment, false);
       setFeedbackComment('');
     }
     if (post.assignedOrgId) {
-      store.addNotification({
+      await store.addNotification({
         userId: post.assignedOrgId,
         text: resolved
           ? `A citizen confirmed resolution for "${post.title}".`
@@ -139,9 +139,9 @@ export function IssueDetailPage() {
     }
   };
 
-  const handleRequestCommunication = () => {
+  const handleRequestCommunication = async () => {
     if (!isOrg || !authorCitizen || !user) return;
-    store.requestCommunication(
+    await store.requestCommunication(
       user.id,
       (user as any).orgName,
       authorCitizen.id,
@@ -150,7 +150,7 @@ export function IssueDetailPage() {
       post.title,
       `Need to discuss the ${post.category} issue at ${post.locality}.`
     );
-    store.addNotification({
+    await store.addNotification({
       userId: authorCitizen.id,
       text: `${(user as any).orgName} requested permission to contact you regarding "${post.title}".`,
       type: 'communication',
@@ -167,6 +167,16 @@ export function IssueDetailPage() {
   const isCommunityConfirmed = totalFeedback > 0 && (post.feedbackYes || 0) > (post.feedbackNo || 0);
 
   const orgProfileLink = (orgId: string) => `${basePath}/organizations/${orgId}`;
+
+  const isEventOrInitiative = post.type === 'Event' || post.type === 'Community Initiative';
+  const isInterested = user?.role === 'citizen' && store.getInterest(user.id, post.id);
+  const interestCount = store.getInterestCount(post.id);
+
+  const handleInterestToggle = async () => {
+    if (!user) { navigate('/login'); return; }
+    if (user.role !== 'citizen' || !isEventOrInitiative) return;
+    await store.toggleInterest(user.id, post.id);
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
@@ -202,6 +212,40 @@ export function IssueDetailPage() {
           <DeletePostButton post={post} variant="full" />
         </div>
       </div>
+
+      {/* Interest toggle for events/initiatives */}
+      {isEventOrInitiative && (
+        <div className="card mb-4 p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                <Heart className={`h-5 w-5 ${isInterested ? 'fill-orange-500 text-orange-500' : 'text-orange-600'}`} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">{interestCount} citizen{interestCount !== 1 ? 's' : ''} interested</p>
+                <p className="text-xs text-gray-500">{isInterested ? 'You marked this as interesting' : 'Express your interest in this event'}</p>
+              </div>
+            </div>
+            {user?.role === 'citizen' ? (
+              <button
+                onClick={handleInterestToggle}
+                className={`inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                  isInterested
+                    ? 'border-orange-500 bg-orange-50 text-orange-700'
+                    : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Heart className={`h-4 w-4 ${isInterested ? 'fill-orange-500 text-orange-500' : ''}`} />
+                {isInterested ? 'Interested' : 'Mark Interested'}
+              </button>
+            ) : !user ? (
+              <Link to="/login" className="btn-secondary text-sm">
+                Sign in to express interest
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      )}
 
       {/* Map preview */}
       {post.lat != null && post.lng != null && (

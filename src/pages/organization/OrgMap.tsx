@@ -89,7 +89,10 @@ export function OrgMapPage() {
           <div className="card p-4">
             <h3 className="mb-3 text-sm font-semibold text-gray-900">Visible Issues ({filtered.length})</h3>
             <div className="max-h-[300px] space-y-2 overflow-y-auto">
-              {filtered.map((issue) => (
+              {filtered.length === 0 ? (
+                <p className="py-4 text-center text-sm text-gray-400">No issues match this filter yet.</p>
+              ) : (
+                filtered.map((issue) => (
                 <button
                   key={issue.id}
                   onClick={() => setSelected(issue)}
@@ -100,7 +103,8 @@ export function OrgMapPage() {
                   <p className="text-sm font-medium text-gray-900 line-clamp-1">{issue.title}</p>
                   <p className="text-xs text-gray-500">{issue.category} · {issue.locality}</p>
                 </button>
-              ))}
+              ))
+              )}
             </div>
           </div>
         </div>

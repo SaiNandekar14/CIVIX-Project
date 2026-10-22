@@ -19,9 +19,9 @@ export function CitizenNotificationsPage() {
   const notifications = store.getNotifications(user.id);
   const commRequests = store.getCommRequests(user.id);
 
-  const handleAccept = (reqId: string, orgId: string, orgName: string, postTitle: string) => {
-    store.respondCommRequest(reqId, 'allowed');
-    store.addNotification({
+  const handleAccept = async (reqId: string, orgId: string, orgName: string, postTitle: string) => {
+    await store.respondCommRequest(reqId, 'allowed');
+    await store.addNotification({
       userId: orgId,
       text: `${user.name} accepted your communication request regarding "${postTitle}". You can now view their contact details.`,
       type: 'communication',
@@ -30,9 +30,9 @@ export function CitizenNotificationsPage() {
     });
   };
 
-  const handleDeny = (reqId: string, orgId: string, orgName: string, postTitle: string) => {
-    store.respondCommRequest(reqId, 'declined');
-    store.addNotification({
+  const handleDeny = async (reqId: string, orgId: string, orgName: string, postTitle: string) => {
+    await store.respondCommRequest(reqId, 'declined');
+    await store.addNotification({
       userId: orgId,
       text: `${user.name} denied your communication request regarding "${postTitle}".`,
       type: 'communication',
@@ -110,8 +110,8 @@ export function CitizenNotificationsPage() {
               <div
                 key={n.id}
                 className={`card flex items-start gap-3 p-4 cursor-pointer ${!n.read ? 'border-orange-200 bg-orange-50/30' : ''}`}
-                onClick={() => {
-                  store.markNotificationRead(n.id);
+                onClick={async () => {
+                  await store.markNotificationRead(n.id);
                   if (n.postId) navigate(`/citizen/issue/${n.postId}`);
                 }}
               >

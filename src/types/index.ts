@@ -113,6 +113,11 @@ export interface ReactionRecord {
   reaction: ReactionType;
 }
 
+export interface InterestRecord {
+  userId: string;
+  postId: string;
+}
+
 export interface CommRequest {
   id: string;
   orgId: string;
